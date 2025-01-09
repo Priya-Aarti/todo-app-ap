@@ -4,7 +4,7 @@
   padding: 20px;
   text-align: center;
   font-family: Arial, sans-serif;
-  background-color: #f9f9f9;
+  background-color: #fffadc;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
@@ -24,14 +24,14 @@ h1 {
   width: 80%;
   padding: 10px;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid #000000;
   border-radius: 5px;
 }
 
 .todo-form button {
   padding: 10px;
   font-size: 1rem;
-  background-color: #28a745;
+  background-color: #4dcc69;
   color: white;
   border: none;
   border-radius: 5px;
@@ -58,13 +58,13 @@ ul {
 
 .todo-item.completed span {
   text-decoration: line-through;
-  color: gray;
+  color: rgb(0, 0, 0);
 }
 
 .todo-item button {
-  background-color: #dc3545;
+  background-color: #e72e41;
   border-radius: 5px;
-  color: white;
+  color: rgb(36, 30, 30);
   border: none;
   cursor: pointer;
   font-size: 0.9rem;
@@ -72,4 +72,28 @@ ul {
 
 .todo-item button:hover {
   background-color: #c82333;
+}
+
+/* Show More button styling */
+.show-more, .show-less {
+  margin-top: 20px;
+  padding: 10px;
+  font-size: 1rem;
+  background-color: #007bff ;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.show-more:hover, .show-less:hover {
+  background-color: #0056b3;
+}
+
+.show-less {
+  background-color: #ffc107;
+}
+
+.show-less:hover {
+  background-color: #e0a800;
 }

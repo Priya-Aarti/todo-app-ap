@@ -1,142 +1,115 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import './App.css';
 
-const TodoApp = () => {
-  const [tasks, setTasks] = useState([]);
-  const [task, setTask] = useState("");
-  const [showAll, setShowAll] = useState(false);
+const App = () => {
+  const [todos, setTodos] = useState([]);
+  const [newTodo, setNewTodo] = useState('');
+  const [visibleCount, setVisibleCount] = useState(5); // Initial number of visible tasks
 
-  // Add a new task on Enter key press
-  const addTask = (e) => {
-    if (e.key === "Enter" && task.trim()) {
-      setTasks([...tasks, { text: task.trim(), completed: false }]);
-      setTask("");
+  // Function to handle adding a new to-do via form submission
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Prevent page refresh on form submit
+
+    if (newTodo.trim() !== '') {
+      setTodos([
+        ...todos,
+        { id: Date.now(), text: newTodo, completed: false },
+      ]);
+      setNewTodo('');
     }
   };
 
-  // Mark a task as completed
-  const completeTask = (index) => {
-    const updatedTasks = [...tasks];
-    updatedTasks[index].completed = true;
-    const completedTasks = updatedTasks.filter((t) => t.completed);
-    const pendingTasks = updatedTasks.filter((t) => !t.completed);
-    setTasks([...pendingTasks, ...completedTasks]);
+  // Function to toggle completion status of a to-do
+  const toggleTodo = (id) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
   };
 
-  // Remove a task
-  const removeTask = (index) => {
-    const updatedTasks = tasks.filter((_, i) => i !== index);
-    setTasks(updatedTasks);
+  // Function to delete a to-do
+  const deleteTodo = (id) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
   };
 
-  // Toggle "Show More" state
-  const toggleShowAll = () => setShowAll(!showAll);
+  // Show more function: Increases the number of visible tasks by 5
+  const showMore = () => {
+    setVisibleCount(visibleCount + 5);
+  };
+
+  // Show less function: Decreases the number of visible tasks by 5
+  const showLess = () => {
+    setVisibleCount(visibleCount - 5);
+  };
+
+  // Sorting the tasks, with completed ones at the bottom
+  const sortedTodos = [
+    ...todos.filter((todo) => !todo.completed), // Non-completed tasks
+    ...todos.filter((todo) => todo.completed), // Completed tasks
+  ];
 
   return (
-    <div
-      style={{
-        backgroundColor: "#fffacd", // Light pink aesthetic background
-        color: "#000",
-        fontFamily: "'Times New Roman', serif", // Handwriting-style font
-        padding: "20px",
-        maxWidth: "400px",
-        margin: "0 auto",
-        borderRadius: "10px",
-        boxShadow: "0 8px 8px rgba(0, 0, 0, 0.1)",
-      }}
-    >
-      <h2 style={{ textAlign: "center" }}>To-Do List</h2>
+    <div className="todo-app">
+      <h1>To-Do List</h1>
 
-      {/* Input Field */}
-      <input
-        type="text"
-        placeholder="Add a new task"
-        value={task}
-        onChange={(e) => setTask(e.target.value)}
-        onKeyDown={addTask}
-        style={{
-          width: "90%",
-          padding: "10px",
-          marginBottom: "15px",
-          border: "2px solid #000000",
-          borderRadius: "5px",
-          fontFamily: "'Times New Roman', serif",
-        }}
+      {/* Form for adding new to-do */}
+      <form onSubmit={handleSubmit} className="todo-form">
+        <input
+          type="text"
+          value={newTodo}
+          onChange={(e) => setNewTodo(e.target.value)}
+          placeholder="Add a new task"
+        />
+        <button type="submit">Add</button>
+      </form>
+
+      {/* Render visible todo items */}
+      <TodoList
+        todos={sortedTodos.slice(0, visibleCount)} // Only show the visible tasks
+        toggleTodo={toggleTodo}
+        deleteTodo={deleteTodo}
       />
 
-      {/* Tasks List */}
-      <ul style={{ listStyle: "none", padding: 0 }}>
-        {(showAll ? tasks : tasks.slice(0, 4)).map((t, index) => (
-          <li
-            key={index}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "10px",
-              textDecoration: t.completed ? "line-through" : "none",
-              color: t.completed ? "gray" : "#000",
-              fontSize: "18px",
-            }}
-          >
-            <span>{t.text}</span>
-            <div>
-              {!t.completed && (
-                <button
-                  onClick={() => completeTask(index)}
-                  style={{
-                    marginRight: "10px",
-                    backgroundColor: "#90ee90", // Light blue for the Complete button
-                    border: "none",
-                    borderRadius: "5px",
-                    padding: "5px 10px",
-                    cursor: "pointer",
-                    fontFamily: "'Times New Roman', serif",
-                  }}
-                >
-                  Complete
-                </button>
-              )}
-              <button
-                onClick={() => removeTask(index)}
-                style={{
-                  backgroundColor: "#FF6F61", // Light red for Remove button
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "5px",
-                  padding: "5px 10px",
-                  cursor: "pointer",
-                  fontFamily: "'Times New Roman', serif",
-                }}
-              >
-                ❌
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {/* Show more or show less button */}
+      {todos.length > visibleCount && (
+        <button onClick={showMore} className="show-more">
+          Show More
+        </button>
+      )}
 
-      {/* Show More Button */}
-      {tasks.length > 6 && (
-        <button
-          onClick={toggleShowAll}
-          style={{
-            width: "100%",
-            marginTop: "15px",
-            backgroundColor: "#87ceeb", // Light pink for Show More button
-            border: "none",
-            borderRadius: "5px",
-            padding: "10px",
-            cursor: "pointer",
-            fontFamily: "'Times New Roman', serif",
-            fontSize: "16px",
-          }}
-        >
-          {showAll ? "Show Less" : "Show More"}
+      {visibleCount > 5 && (
+        <button onClick={showLess} className="show-less">
+          Show Less
         </button>
       )}
     </div>
   );
 };
 
-export default TodoApp;
+const TodoList = ({ todos, toggleTodo, deleteTodo }) => (
+  <ul>
+    {todos.map((todo) => (
+      <TodoItem
+        key={todo.id}
+        todo={todo}
+        toggleTodo={toggleTodo}
+        deleteTodo={deleteTodo}
+      />
+    ))}
+  </ul>
+);
 
+const TodoItem = ({ todo, toggleTodo, deleteTodo }) => (
+  <li className={`todo-item ${todo.completed ? 'completed' : ''}`}>
+    <input
+      type="checkbox"
+      checked={todo.completed}
+      onChange={() => toggleTodo(todo.id)}
+    />
+    <span>{todo.text}</span>
+    <button onClick={() => deleteTodo(todo.id)}>Delete</button>
+  </li>
+);
+
+export default App;
